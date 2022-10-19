@@ -1,38 +1,44 @@
 class Snake {
-  constructor() {
-    this.pos = { x: 0, y: 0 };
+  constructor(pos,scale) {
+    this.prePos = pos;
+    this.pos = pos;
     this.vel = { x: 0, y: 0 };
-    this.size = 25;
+    this.scale = scale;
     this.tail = [];
   }
   getPos() {
     return this.pos;
   }
   update() {
-    this.tail.unshift(this.pos)
+    this.tail.unshift(Object.assign({}, this.prePos))
     this.tail.pop()
   }
   draw() {
     ctx.fillStyle = "black";
-    ctx.fillRect(this.pos.x, this.pos.y, 10, 10);
+    ctx.fillRect(this.pos.x, this.pos.y, this.scale*1, this.scale*1);
     this.tail.forEach((t,index) => {
-      ctx.fillRect(t.x, t.y, 10, 10);
+      ctx.fillRect(t.x, t.y, this.scale*1, this.scale*1);
       console.log('tail #',index,'pos ',t)
     });
   }
   changeDirection(direction) {
+    let prevVel = Object.assign({}, this.vel);
     switch (direction) {
       case "W":
-        this.vel = { x: 0, y: -10 };
+        if(prevVel.y !== 0) return;
+        this.vel = { x: 0, y: -this.scale*1 };
         break;
       case "S":
-        this.vel = { x: 0, y: 10 };
+        if(prevVel.y !== 0) return;
+        this.vel = { x: 0, y: this.scale*1 };
         break;
       case "A":
-        this.vel = { x: -10, y: 0 };
+        if(prevVel.x !== 0) return;
+        this.vel = { x: -this.scale*1, y: 0 };
         break;
       case "D":
-        this.vel = { x: 10, y: 0 };
+        if(prevVel.x !== 0) return;
+        this.vel = { x: this.scale*1, y: 0 };
         break;
     }
   }
@@ -45,11 +51,22 @@ class Snake {
     return condition;
   }
   move() {
+    this.prePos = Object.assign({}, this.pos);
     this.pos.x += this.vel.x;
     this.pos.y += this.vel.y;
   }
   addTail() {
-    this.tail.push(this.pos)
+    this.tail.push(Object.assign({}, this.prePos));
+    console.log('tail',this.tail)
+  }
+  gameOver() {
+    if (this.pos.x > canvas.width - this.scale || this.pos.x < 0 || this.pos.y > canvas.height - this.scale || this.pos.y < 0) {
+      return true;
+    }
+    let condition = this.tail.some((tailPos) => {
+      return JSON.stringify(tailPos) === JSON.stringify(this.pos)
+    })
+    return condition;
   }
 }
 
@@ -70,10 +87,12 @@ class Food {
 
 }
 
-const snake = new Snake();
+const snake = new Snake({ x: randomNum(1, 35), y: randomNum(1, 35) },10);
 
 const onKey = document.addEventListener("keydown", (e) => {
-  snake.changeDirection(e.key.toUpperCase());
+  setTimeout(() => {
+    snake.changeDirection(e.key.toUpperCase());
+  }, 100)
 });
 
 const canvas = document.getElementById("snake");
@@ -83,21 +102,25 @@ function randomNum(min,max) {
   return Math.floor(Math.random() * (max - min) + min)*10;
 }
 
-const food = new Food({ x: 10, y: 10 });
+const food = new Food({ x: randomNum(1, 35), y: randomNum(1, 35) });
+
 function main() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   snake.move();
   snake.update();
-  snake.draw();
   food.draw();
+  snake.draw();
   if (snake.isAvailable(food.getPos())) {
-    food.setPos({ x: randomNum(1,25), y: randomNum(1,25)})
+    food.setPos({ x: randomNum(1,35), y: randomNum(1,35)})
     snake.addTail()
     food.draw()
   }
+  if (snake.gameOver()) {
+    alert("Game Over");
+  }
   setTimeout(() => {
     requestAnimationFrame(main);
-  },250)
+  },100)
 }
 
 main()
