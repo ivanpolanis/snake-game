@@ -14,8 +14,9 @@ class Snake {
     this.tail.pop()
   }
   draw() {
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "yellow";
     ctx.fillRect(this.pos.x, this.pos.y, this.scale*1, this.scale*1);
+    ctx.fillStyle = "blue";
     this.tail.forEach((t,index) => {
       ctx.fillRect(t.x, t.y, this.scale*1, this.scale*1);
       console.log('tail #',index,'pos ',t)
@@ -71,8 +72,11 @@ class Snake {
 }
 
 class Food {
-  constructor(pos) {
+  constructor(pos,scale) {
     this.pos = pos;
+    this.scale = scale;
+    this.img = new Image()
+    this.img.src = 'assets/River_Plate_1998.svg'
   }
   getPos() {
     return this.pos;
@@ -81,8 +85,8 @@ class Food {
     this.pos = pos;
   }
   draw() {
-    ctx.fillStyle = "red";
-    ctx.fillRect(this.pos.x, this.pos.y, 10, 10);
+    ctx.drawImage(this.img, this.pos.x, this.pos.y, 10, 10);
+
   }
 
 }
@@ -112,7 +116,7 @@ const snake = new Snake({ x: randomNum(1, 35), y: randomNum(1, 35) },10);
 const onKey = document.addEventListener("keydown", (e) => {
   setTimeout(() => {
     snake.changeDirection(e.key.toUpperCase());
-  }, 100)
+  }, 100 - 2*score.getScore())
 });
 
 const canvas = document.getElementById("snake");
@@ -146,8 +150,7 @@ function main() {
   } else {
     setTimeout(() => {
       requestAnimationFrame(main);
-    },100)
-
+    },100 - 2*score.getScore())
   }
 }
 

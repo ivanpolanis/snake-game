@@ -1,6 +1,7 @@
 canvas {
     border: 1px solid #000;
-    background: green;
+    background-image: url('https://cdn.discordapp.com/attachments/961723016037953558/1033002751526981753/unknown.png');
+    background-size: 100% 100%;
     z-index: -1;
 }
 .container{
@@ -45,3 +46,7 @@ canvas {
     cursor: pointer;
 }
 
+body{
+    background-image: url("./assets/serpiente.jpg");
+    background-size: cover;
+}
