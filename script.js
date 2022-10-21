@@ -87,6 +87,26 @@ class Food {
 
 }
 
+class Score {
+  constructor() {
+    this.score = 0;
+  }
+  getScore() {
+    return this.score;
+  }
+  setScore(score) {
+    this.score = score;
+  }
+  increaseScore() {
+    this.score++;
+  }
+  draw() {
+    ctx.fillStyle = "white";
+    ctx.font = "20px Arial";
+    ctx.fillText("Score: " + this.score, 10, 20);
+  }
+}
+
 const snake = new Snake({ x: randomNum(1, 35), y: randomNum(1, 35) },10);
 
 const onKey = document.addEventListener("keydown", (e) => {
@@ -103,24 +123,32 @@ function randomNum(min,max) {
 }
 
 const food = new Food({ x: randomNum(1, 35), y: randomNum(1, 35) });
-
+const score = new Score();
 function main() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   snake.move();
   snake.update();
   food.draw();
   snake.draw();
+  score.draw();
   if (snake.isAvailable(food.getPos())) {
     food.setPos({ x: randomNum(1,35), y: randomNum(1,35)})
     snake.addTail()
     food.draw()
+    score.increaseScore()
   }
   if (snake.gameOver()) {
-    alert("Game Over");
+    document.getElementById("game-over").style.display = "flex";
+    const button = document.getElementById("btn")
+    button.addEventListener('click', () => {
+      window.location.reload();
+    }) 
+  } else {
+    setTimeout(() => {
+      requestAnimationFrame(main);
+    },100)
+
   }
-  setTimeout(() => {
-    requestAnimationFrame(main);
-  },100)
 }
 
 main()
